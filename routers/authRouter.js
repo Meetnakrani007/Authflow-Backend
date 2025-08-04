@@ -8,4 +8,5 @@ router.post("/signin", authController.signin);
 router.post("/signout", identifier, authController.signout);
 router.patch("/sent-code", identifier, authController.sendVerificationCode);
 router.patch("/verify-code", identifier, authController.verifyVerificationCode);
+router.patch("/change-password", identifier, authController.changePassword);
 module.exports = router;

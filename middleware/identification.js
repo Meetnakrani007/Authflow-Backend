@@ -7,13 +7,14 @@ exports.identifier = (req, res, next) => {
     token = req.cookies["Authorization"];
   }
   if (!token) {
-    return res.status(403).json({ success: false, message: "Unothorized" });
+    return res.status(403).json({ success: false, message: "UnAuthorized" });
   }
   try {
     const userToken = token.split(" ")[1];
     const jwtVerified = jwt.verify(userToken, process.env.TOKEN_SECRET);
     if (jwtVerified) {
       req.user = jwtVerified;
+      next();
     } else {
       throw new Error("error in the token");
     }

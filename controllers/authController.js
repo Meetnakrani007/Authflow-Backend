@@ -3,6 +3,7 @@ const {
   signupSchema,
   signinSchema,
   acceptCodeSchema,
+  changePasswordSchema,
 } = require("../middleware/validator");
 const User = require("../models/userModel");
 const { doHash, doHashValidation, hmacProcess } = require("../utils/hashing");
@@ -202,6 +203,49 @@ exports.verifyVerificationCode = async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "Unexpexted error occured!" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  const { userId, verified } = req.user;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const { error, value } = changePasswordSchema.validate({
+      oldPassword,
+      newPassword,
+    });
+    if (error) {
+      return res.json({ success: false, message: error.details[0].message });
+    }
+    if (!verified) {
+      return res
+        .status(401)
+        .json({ success: false, message: "You are not verified" });
+    }
+
+    const existingUser = await User.findOne({ _id: userId }).select(
+      "+password"
+    );
+    if (!existingUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User does not exist!" });
+    }
+    const result = await doHashValidation(oldPassword, existingUser.password);
+    if (!result) {
+      return res
+        .status(404)
+        .json({ success: false, message: "invalid credential!" });
+    }
+    const hashedpassword = await doHash(newPassword, 12);
+    existingUser.password = hashedpassword;
+    await existingUser.save();
+    return res.status(200).json({
+      success: true,
+      message: "Your password is updated ",
+    });
   } catch (error) {
     console.log(error);
   }
