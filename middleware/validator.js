@@ -43,3 +43,16 @@ exports.changePasswordSchema = Joi.object({
     .required()
     .pattern(new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)),
 });
+exports.forgotPasswordCodeSchema = Joi.object({
+  email: Joi.string()
+    .min(6)
+    .max(60)
+    .required()
+    .email({
+      tlds: { allow: ["com", "net"] },
+    }),
+  providedCode: Joi.number(),
+  newPassword: Joi.string()
+    .required()
+    .pattern(new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/)),
+});

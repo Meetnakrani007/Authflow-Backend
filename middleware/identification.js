@@ -7,7 +7,7 @@ exports.identifier = (req, res, next) => {
     token = req.cookies["Authorization"];
   }
   if (!token) {
-    return res.status(403).json({ success: false, message: "UnAuthorized" });
+    return res.status(403).json({ success: false, message: "Unauthorized" });
   }
   try {
     const userToken = token.split(" ")[1];
